@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>❀TheGrotto❀˖°</title>
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Quicksand:wght@300;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg1: #c6c1ff;
+      --bg2: #ffd6f6;
+      --accent: #fff6fa;
+      --pastel-blue: #d7f0ff;
+      --pastel-pink: #ffdff1;
+      --pastel-purple: #e9d6ff;
+      --text: #ffffff;
+
+      /* Midnight Theme Colors */
+      --midnight-bg1: #1e1e2f;
+      --midnight-bg2: #312845;
+      --midnight-accent: #9277ff;
+      --midnight-text: #f0f0f0;
+    }
+
+    [data-theme="midnight"] {
+      --bg1: var(--midnight-bg1);
+      --bg2: var(--midnight-bg2);
+      --accent: var(--midnight-accent);
+      --text: var(--midnight-text);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      min-height: 100vh;
+      position: relative;
+      font-family: 'Quicksand', sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
+      opacity: 0;
+      animation: fadeIn 1.5s ease forwards;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background:
+        linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%),
+        url("https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/image_2025-10-19_141336012.png") center center / cover no-repeat fixed; /* IMAGE REMOVED */
+      background-blend-mode: overlay;
+      filter: grayscale(30%) brightness(0.65) opacity(0.75) blur(2px);
+      z-index: -1;
+    }
+
+    main, section, nav, .music-player, .theme-toggle, .status-badge { position: relative; z-index: 1; }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* Floating particles */
+    .particle-bg { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; }
+    .particle-bg::before, .particle-bg::after {
+      content:""; position:absolute; top:0; left:0; width:200%; height:200%;
+      background: radial-gradient(white 1px, transparent 1px); background-size:50px 50px;
+      opacity:0.1; animation: float 60s linear infinite;
+    }
+    .particle-bg::after { animation-delay:-30s; opacity:0.15; }
+    @keyframes float { from{transform:translate(0,0);} to{transform:translate(-200px,-200px);} }
+
+    /* Navbar */
+    nav.navbar {
+      position: fixed; top:20px; left:50%; transform:translateX(-50%);
+      background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2); padding:0.5rem 1rem; border-radius:30px;
+      box-shadow:0 0 20px rgba(255,255,255,0.2); z-index:100;
+    }
+    .navbar ul { display:flex; gap:1.5rem; list-style:none; }
+    .navbar a { text-decoration:none; font-family:'IM Fell English SC', serif; font-size:1.1rem; color:var(--text); transition:0.3s ease; }
+    .navbar a:hover { text-shadow:0 0 10px var(--accent); }
+
+    /* Status Indicator */
+    .status-badge { margin-top:80px; text-align:center; font-family:'IM Fell English SC', serif; font-size:1.3rem; }
+    .status-badge span {
+      padding:0.4rem 1rem; border-radius:20px; font-weight:600;
+      box-shadow:0 0 10px rgba(255,255,255,0.3); color:#3a2f3f;
+      background: linear-gradient(135deg, var(--pastel-pink), var(--pastel-purple));
+    }
+
+    main { max-width:900px; margin:40px auto 50px auto; padding:0 1rem; display:flex; flex-direction:column; gap:3rem; }
+    section {
+      background: rgba(255,255,255,0.05); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.15); padding:2rem; border-radius:20px;
+      box-shadow:0 0 15px rgba(255,255,255,0.15); text-align:center;
+    }
+    section h2 { font-family:'IM Fell English SC', serif; font-size:1.8rem; margin-bottom:1rem; text-shadow:0 0 10px rgba(255,255,255,0.5); }
+
+    /* Welcome Section */
+    #welcome { text-align:center; }
+
+    /* Music Player */
+    .music-player { position:fixed; bottom:20px; left:20px; z-index:200; display:flex; flex-direction:column; align-items:center; gap:0.5rem;
+      background:rgba(255,255,255,0.05); backdrop-filter: blur(10px); padding:0.8rem 1rem; border-radius:20px; border:1px solid rgba(255,255,255,0.2); }
+    .music-btn { background:none; border:none; cursor:pointer; }
+    .music-btn img { width:40px; height:40px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.4)); }
+    .track-select { background: rgba(255,255,255,0.8); border:none; border-radius:10px; padding:0.3rem 0.5rem; font-family:'Quicksand',sans-serif; }
+
+    /* Theme Toggle */
+    .theme-toggle { position:fixed; top:20px; right:20px; cursor:pointer; padding:0.5rem 1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.2); border-radius:20px; backdrop-filter: blur(10px); z-index:200; }
+
+    /* Cursor Sparkles */
+    .sparkle { position:fixed; width:8px; height:8px; background:white; border-radius:50%; pointer-events:none; opacity:0.8; box-shadow:0 0 10px white; animation:sparkleFade 1s ease-out forwards; }
+    @keyframes sparkleFade { to{ transform:scale(0.5) translateY(-20px); opacity:0; } }
+
+    /* Social icons layout */
+    .social-icons { display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .social-item { display:flex; flex-direction:column; align-items:center; font-family:'Quicksand',sans-serif; font-size:0.8rem; color:var(--text); text-align:center; }
+    .social-item img { width:80px; height:80px; margin-bottom:0.3rem; transition: transform 0.3s ease; }
+    .social-item img:hover { transform: scale(1.2); }
+    .social-item span { display:block; margin-top:0.1rem; color:var(--text); text-shadow:0 0 5px rgba(255,255,255,0.5); }
+
+    /* Ko-fi Button */
+    .kofi-wrapper { display:flex; justify-content:center; margin-top:0.5rem; }
+    .kofi-btn { font-family:'Quicksand',sans-serif; text-decoration:none; padding:0.5rem 1rem; border-radius:15px; background: linear-gradient(135deg, var(--pastel-pink), var(--pastel-purple)); color:var(--text); font-weight:600; box-shadow:0 0 10px rgba(255,255,255,0.3); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .kofi-btn:hover { transform:scale(1.05); box-shadow:0 0 15px rgba(255,255,255,0.5); }
+
+    /* Gallery grid */
+    .gallery-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:1rem; }
+
+    /* Guestbook */
+    .guest-note { background: rgba(255,255,255,0.1); padding:0.5rem 0.8rem; margin-bottom:0.5rem; border-radius:12px; animation: floatNote 1s ease forwards; }
+    @keyframes floatNote { from{transform:translateY(20px); opacity:0;} to{transform:translateY(0); opacity:1;} }
+
+    /* Lightbox */
+    .lightbox { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:300; }
+    .lightbox img { max-width:90%; max-height:90%; border-radius:10px; }
+
+    /* Personal Work + Moodboard */
+    #personal-moodboard { display:flex; gap:2rem; flex-wrap:wrap; }
+    .personal-work .gallery-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1rem; }
+    .moodboard-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; }
+    .moodboard-grid img { width:100%; border-radius:12px; cursor:pointer; transition: transform 0.3s ease; }
+    .moodboard-grid img:hover { transform: scale(1.05); }
+    @media (max-width:900px){ #personal-moodboard{flex-direction:column;} }
+  /* Decorative Images */
+.decorative-img {
+  width: 100%;
+  max-width: 300px;
+  display: block;
+  margin: 0 auto;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(255,255,255,0.3);
+  transition: transform 0.3s ease, opacity 1s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1.5s ease forwards;
+}
+
+/* Hover scale effect */
+.decorative-img:hover {
+  transform: scale(1.05);
+}
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optional spacing */
+#decorative-top {
+  margin: 0 auto 2rem auto;
+  text-align: center;
+}
+
+#decorative-bottom {
+  margin: 2rem auto 3rem auto;
+  text-align: center;
+}
+
+/* Parallax floating on scroll */
+.decorative-img[data-parallax] {
+  transition: transform 0.1s linear;
+}
+/* ------------------- MOBILE OPTIMIZATION ------------------- */
+@media (max-width: 900px) {
+  body {
+    font-size: 0.9rem;
+  }
+
+  nav.navbar {
+    top: 10px;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .navbar ul {
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  main {
+    margin: 20px 1rem 30px 1rem;
+    gap: 2rem;
+  }
+
+  section {
+    padding: 1.5rem 1rem;
+  }
+
+  section h2 {
+    font-size: 1.5rem;
+  }
+
+  .status-badge {
+    margin-top: 60px;
+    font-size: 1.1rem;
+  }
+
+  .music-player {
+    bottom: 10px;
+    left: 10px;
+    padding: 0.6rem 0.8rem;
+    gap: 0.3rem;
+  }
+
+  .music-btn img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .track-select {
+    font-size: 0.85rem;
+  }
+
+  .theme-toggle {
+    top: 10px;
+    right: 10px;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .social-icons {
+    gap: 1rem;
+  }
+
+  .social-item img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .kofi-btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .moodboard-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.3rem;
+  }
+
+  .guest-note {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  /* Decorative Images */
+  .decorative-img {
+    max-width: 90%;
+  }
+
+  /* Cursor sparkles & particles reduced for mobile performance */
+  .particle-bg::before, .particle-bg::after {
+    opacity: 0.05;
+  }
+
+  .sparkle {
+    width: 6px;
+    height: 6px;
+  }
+}
+
+@media (max-width: 500px) {
+  body {
+    font-size: 0.85rem;
+  }
+
+  section h2 {
+    font-size: 1.3rem;
+  }
+
+  .navbar ul {
+    gap: 0.8rem;
+  }
+
+  .social-item img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .music-btn img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .track-select {
+    font-size: 0.8rem;
+  }
+
+  .theme-toggle {
+    padding: 0.3rem 0.6rem;
+  }
+
+  .kofi-btn {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .gallery-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .moodboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #personal-moodboard {
+    flex-direction: column;
+  }
+
+  .decorative-img {
+    max-width: 95%;
+    transform: translateY(0) !important; /* reduce parallax float for small screens */
+  }
+
+  .status-badge {
+    margin-top: 50px;
+  }
+}
+/* MOBILE-FRIENDLY BACKGROUND */
+@media (max-width: 900px) {
+  body::before {
+    background-attachment: scroll; /* avoids lag on mobile */
+    background-size: cover;        /* ensure full coverage */
+    filter: grayscale(20%) brightness(0.7) opacity(0.85) blur(1px); /* lighter effects */
+  }
+}
+
+@media (max-width: 500px) {
+  body::before {
+    background-attachment: scroll;
+    background-size: cover;
+    filter: grayscale(10%) brightness(0.75) opacity(0.9) blur(0.5px); /* minimal blur for performance */
+  }
+}
+@media (max-width: 900px) {
+  /* Keep navbar style, but move it below top content */
+  nav.navbar {
+    position: relative;    /* no longer fixed */
+    top: 0;
+    left: 0;
+    transform: none;
+    margin: 1rem auto;     /* centers it */
+    box-shadow: 0 0 15px rgba(255,255,255,0.2); /* keep PC shadow */
+  }
+
+  /* Add spacing at the top of main content so the top image is fully visible */
+  main {
+    margin-top: 2rem;  /* increases space on mobile */
+  }
+
+  /* Optional: make navbar links slightly smaller on mobile for better fit */
+  nav.navbar a {
+    font-size: 1rem;
+  }
+}
+@media (max-width: 900px) {
+  /* Moodboard responsive adjustments */
+  .moodboard-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .moodboard-grid img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+
+  /* Personal Work grid */
+  .personal-work .gallery-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+}
+<!-- Social icons slightly bigger stays as CSS for sizing images -->
+.social-item img {
+  width: 80px;  /* was 40px */
+  height: 80px; /* was 40px */
+  margin-bottom: 0.3rem;
+  transition: transform 0.3s ease;
+}
+
+/* Keep the hover effect */
+.social-item img:hover {
+  transform: scale(1.2);
+}
+/* Personal Work Images same style as Moodboard */
+.personal-work .gallery-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.personal-work .gallery-grid img:hover {
+  transform: scale(1.05);
+}
+
+
+
+  </style>
+</head>
+<body>
+  <div class="particle-bg"></div>
+
+  <nav class="navbar">
+    <ul>
+      <li><a href="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/updates/Updates">Updates</a></li>
+      <li><a href="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/wips/wips">WIPS</a></li>
+      <li><a href="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/socials/socials">Socials</a></li>
+      <li><a href="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/gallery/faves">Gallery</a></li>
+      <li><a href="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/commissionsheet/comms">Commissions</a></li>
+      <li><a href="https://trello.com/b/1V74TKet/̀ᴗ́و-̑̑-commission-queue-☆ﾟ-･-｡ﾟ">Trello</a></li>
+      <li><a href="#guestbook">Guestbook</a></li>
+      <li><a href="https://phalaenopsyx.neocities.org">Mirror</a></li>
+    </ul>
+  </nav>
+
+  <div class="status-badge">
+    Commissions: <span id="status-text">CLOSED</span>
+  </div>
+
+  <main>
+  <section id="decorative-bottom">
+  <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/Untitled_Artwork.gif" alt="Decorative Bottom" class="decorative-img" style="animation-delay:1s;"><!-- IMAGE REMOVED -->
+</section>
+    <!-- Welcome -->
+    <section id="welcome">
+      <h2>‎♡‧₊˚✧ Welcome ✧˚₊‧♡</h2>
+      <p>Hello! Welcome to my website! This is a work in progress so expect changes here and there. I want to treat this as a sort of "Main hub" for all of my socials and works... :) Feel free to have a look around, contact me, or read some of my stuff. (*ᴗ͈ˬᴗ͈)ꕤ*.ﾟ </p>
+    </section>
+
+    <!-- About -->
+    <section id="about">
+      <h2>About Me(ദ്ദി˙ᗜ˙)</h2>
+      <p>┊ ˚✩ ⋆｡˚ ✩
+┊  ✫ {Orchid} 
+┊  - {They❀Them} - 
+┊ ⊹ ┊ Hello! I am a 23 year old, queer, Multimedia artist and Illustrator from Florida, who specialzies in high fanatasy-whimsy themes, occasionally dipping my toes into horror and surrealism.} <3 ✯ ⋆ 
+┊ . ˚┊Next to my love for art is: Video games, animation, literature, fiberworks, and nature. Most of my work is inspired by my favorite pieces of media and things I have learned from the world around me :)
+┊ . ˚┊Hoping one day I can participate in a big project creatively or put something out myself! :DDD</p>
+    </section>
+
+    <!-- Notices -->
+    <section id="notices" class="notice-board">
+      <div class="notice-text" id="notice-text"></div>
+    </section>
+
+    <!-- Socials -->
+    <section id="socials">
+      <h2>Find Me Online</h2>
+      <div class="social-icons">
+        <div class="social-item"><a href="https://www.instagram.com/phalaenopsyx/?hl=en"><img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/image_2025-10-19_142616621.png" alt="Instagram"><!-- IMAGE REMOVED --><span>Instagram</span></a></div>
+        <div class="social-item"><a href="https://www.tumblr.com/phalaenopsyx"><img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/image_2025-10-19_142600515.png" alt="Tumblr"><!-- IMAGE REMOVED --><span>Tumblr</span></a></div>
+        <div class="social-item"><a href="https://toyhou.se/phalaenopsyx"><img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/image_2025-10-19_142634161.png" alt="Toyhouse"><!-- IMAGE REMOVED --><span>Toyhouse</span></a></div>
+        <div class="social-item"><a href="https://bsky.app/profile/degenopsyx.bsky.social"><img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/image_2025-10-19_142656663.png" alt="BlueSky"><!-- IMAGE REMOVED --><span>BlueSky</span></a></div>
+      </div>
+      <div class="kofi-wrapper">
+        <a class="kofi-btn" href="https://ko-fi.com/yourusername" target="_blank">☕ Support me on Ko-fi</a>
+      </div>
+    </section>
+<!-- Decorative Image Under Socials -->
+<section id="decorative-bottom">
+  <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/Untitled_Artwork.webp" alt="Decorative Bottom" class="decorative-img" style="animation-delay:1s;"><!-- IMAGE REMOVED -->
+</section>
+
+    <!-- Personal Work + Moodboard -->
+    <section id="personal-moodboard">
+      <div class="personal-work">
+        <h2>Personal Work</h2>
+        <div class="gallery-grid">
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/personal%20art/image_2025-10-19_144319098.png" alt="Personal Art 1" onclick="openLightbox(this.src)">
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/personal%20art/image_2025-10-19_144302302.png" alt="Personal Art 2" onclick="openLightbox(this.src)">
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/personal%20art/image_2025-10-19_144241625.png" alt="Personal Art 3" onclick="openLightbox(this.src)">
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/personal%20art/image_2025-10-19_144217969.png" alt="Personal Art 4" onclick="openLightbox(this.src)">
+           <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/personal%20art/image_2025-10-19_144201808.png" alt="Personal Art 5" onclick="openLightbox(this.src)">
+            <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/personal%20art/image_2025-10-19_144127010.png" alt="Personal Art 6" onclick="openLightbox(this.src)">
+             <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/personal%20art/image_2025-10-19_144712369.png" alt="Personal Art 6" onclick="openLightbox(this.src)">
+              <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/personal%20art/image_2025-10-19_144726275.png" alt="Personal Art 6" onclick="openLightbox(this.src)">
+        </div>
+      </div>
+      <div class="moodboard">
+        <h2>Visual Inspo</h2>
+        <div class="moodboard-grid">
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/mb/image_2025-10-19_152119764.png" alt="Moodboard 1"><!-- IMAGE REMOVED -->
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/mb/image_2025-10-19_152105885.png" alt="Moodboard 2"><!-- IMAGE REMOVED -->
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/mb/image_2025-10-19_152054612.png" alt="Moodboard 3"><!-- IMAGE REMOVED -->
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/mb/image_2025-10-19_152041848.png" alt="Moodboard 4"><!-- IMAGE REMOVED -->
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/mb/image_2025-10-19_152031388.png" alt="Moodboard 5"><!-- IMAGE REMOVED -->
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/mb/image_2025-10-19_152014853.png" alt="Moodboard 6"><!-- IMAGE REMOVED -->
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/mb/image_2025-10-19_152006340.png" alt="Moodboard 7"><!-- IMAGE REMOVED -->
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/mb/image_2025-10-19_151956218.png" alt="Moodboard 8"><!-- IMAGE REMOVED -->
+          <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/mb/image_2025-10-19_145447461.png" alt="Moodboard 9"><!-- IMAGE REMOVED -->
+        </div>
+      </div>
+      <div class="moodboard">
+  <h2>Thank you! to:</h2>
+  <div class="moodboard-grid">
+    <div class="mood-item">
+      <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/gallery/image_2025-10-19_211313953.png" alt="Moodboard 1">
+      <p class="caption">Elliefaegurl</p>
+    </div>
+    <div class="mood-item">
+      <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/gallery/image_2025-10-19_211242856.png" alt="Moodboard 2">
+      <p class="caption">Elliefaegurl</p>
+    </div>
+    <div class="mood-item">
+      <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/gallery/image_2025-10-19_211202285.png" alt="Moodboard 3">
+      <p class="caption">Zephyrin_Jackalope</p>
+      </div>
+    <div class="mood-item">
+      <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/gallery/image_2025-10-19_211111466.png" alt="Moodboard 3">
+      <p class="caption">Limescentedpony</p>
+      </div>
+    <div class="mood-item">
+      <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/gallery/image_2025-10-19_211044145.png" alt="Moodboard 3">
+      <p class="caption">Violet_Viper</p>
+      </div>
+    <div class="mood-item">
+      <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/gallery/image_2025-10-19_210859047.png" alt="Moodboard 3">
+      <p class="caption">Cozmapup</p>
+      </div>
+    <div class="mood-item">
+      <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/gallery/image_2025-10-19_210737546.png" alt="Moodboard 3">
+      <p class="caption">Laiokai</p>
+    </div>
+      <div class="mood-item">
+      <img src="https://phalaenopsyx.neocities.org/Site%20Resources/main%20site%20(grotto)/gallery/image_2025-10-20_004131821.png" alt="Moodboard 3">
+      <p class="caption">Nightmareescape</p>
+    </div>
+  </div>
+</section>
+
+    </section>
+
+    <!-- Guestbook -->
+    <section id="guestbook">
+      <h2>Guestbook ✨</h2>
+      <p>Leave a little note if you’d like to say hi or share some love 💌</p>
+      <form id="guestbook-form">
+        <input type="text" id="guest-name" placeholder="Your name" maxlength="20" required>
+        <textarea id="guest-message" placeholder="Write a short message..." maxlength="200" required></textarea>
+        <button type="submit">Send</button>
+      </form>
+      <div id="guest-messages"></div>
+    </section>
+  </main>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Enlarged Art"><!-- already empty -->
+  </div>
+
+  
+
+  <div class="theme-toggle" id="theme-toggle">🌓 Theme</div>
+
+  <script>
+  // Typewriter Notice Board
+  const messages=["︎ ݁˖Commissions are CLOSED!","₊ ⊹❀ New gallery update coming soon.","! Please read my TOS before commissioning me.!","Free Palestine‧⁺ ₊ ⊹."];
+  const noticeText=document.getElementById("notice-text");
+  let messageIndex=0,charIndex=0,typing=true;
+  function typeWriter(){
+    const current=messages[messageIndex];
+    if(typing){
+      if(charIndex<current.length){
+        noticeText.textContent+=current.charAt(charIndex);
+        charIndex++;
+        setTimeout(typeWriter,70);
+      }else{
+        typing=false;
+        setTimeout(typeWriter,2000);
+      }
+    }else{
+      if(charIndex>0){
+        noticeText.textContent=current.substring(0,charIndex-1);
+        charIndex--;
+        setTimeout(typeWriter,40);
+      }else{
+        typing=true;
+        messageIndex=(messageIndex+1)%messages.length;
+        setTimeout(typeWriter,300);
+      }
+    }
+  }
+  typeWriter();
+
+  // Lightbox
+  function openLightbox(src){
+    document.getElementById('lightbox').style.display='flex';
+    document.getElementById('lightbox-img').src=src;
+  }
+  function closeLightbox(){
+    document.getElementById('lightbox').style.display='none';
+  }
+
+  // Guestbook
+  const guestForm=document.getElementById('guestbook-form');
+  const guestMessages=document.getElementById('guest-messages');
+  function loadGuestbook(){
+    const saved=JSON.parse(localStorage.getItem('guestbookMessages'))||[];
+    guestMessages.innerHTML='';
+    saved.forEach(msg=>addGuestNote(msg.name,msg.message,false));
+  }
+  function addGuestNote(name,message,save=true){
+    const note=document.createElement('div');
+    note.classList.add('guest-note');
+    note.innerHTML=`<strong>${name}</strong><p>${message}</p>`;
+    const floatDelay=(Math.random()*3).toFixed(2)+'s';
+    note.style.animationDelay=floatDelay+',0s';
+    guestMessages.prepend(note);
+    if(save){
+      const existing=JSON.parse(localStorage.getItem('guestbookMessages'))||[];
+      existing.push({name,message});
+      localStorage.setItem('guestbookMessages',JSON.stringify(existing));
+    }
+  }
+  guestForm.addEventListener('submit',e=>{
+    e.preventDefault();
+    const name=document.getElementById('guest-name').value.trim();
+    const message=document.getElementById('guest-message').value.trim();
+    if(name&&message){
+      addGuestNote(name,message,true);
+      guestForm.reset();
+    }
+  });
+  loadGuestbook();
+
+  // Music Player (optional)
+  const musicToggle = document.getElementById('music-toggle');
+  const music = document.getElementById('bg-music');
+  const trackSelect = document.getElementById('track-select');
+
+  if (musicToggle && music && trackSelect) {
+    let isPlaying = false;
+    trackSelect.addEventListener('change', () => {
+      music.src = trackSelect.value;
+      if (isPlaying) music.play();
+    });
+    musicToggle.addEventListener('click', () => {
+      if (!isPlaying) {
+        music.src = trackSelect.value;
+        music.play();
+      } else {
+        music.pause();
+      }
+      isPlaying = !isPlaying;
+    });
+  }
+
+  // Theme Switcher
+  const themeToggle=document.getElementById('theme-toggle');
+  const savedTheme=localStorage.getItem('theme');
+  if(savedTheme) document.documentElement.setAttribute('data-theme',savedTheme);
+  themeToggle.addEventListener('click',()=>{
+    const current=document.documentElement.getAttribute('data-theme');
+    const newTheme=current==='midnight'? '':'midnight';
+    document.documentElement.setAttribute('data-theme',newTheme);
+    localStorage.setItem('theme',newTheme);
+  });
+
+  // Live Status
+  const statusText=document.getElementById('status-text');
+  const isOpen=true;
+  statusText.textContent=isOpen?'OPEN':'CLOSED';
+  statusText.style.background=isOpen?'linear-gradient(135deg, var(--pastel-pink), var(--pastel-purple))':'linear-gradient(135deg, #ffb3b3, #ff6666)';
+
+  // Cursor Sparkles
+  document.addEventListener('mousemove',e=>{
+    const sparkle=document.createElement('div');
+    sparkle.classList.add('sparkle');
+    sparkle.style.left=e.pageX+'px';
+    sparkle.style.top=e.pageY+'px';
+    document.body.appendChild(sparkle);
+    setTimeout(()=>sparkle.remove(),1000);
+  });
+
+  // Parallax effect for decorative images
+  const parallaxImages = document.querySelectorAll('.decorative-img');
+  window.addEventListener('scroll', () => {
+    parallaxImages.forEach(img => {
+      const speed = 0.2;
+      const offset = window.scrollY * speed;
+      img.style.transform = `translateY(${offset}px)`;
+    });
+  });
+</script>
