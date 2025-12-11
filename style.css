@@ -1,0 +1,83 @@
+/* --- FONTS & COLORS --- */
+body {
+  margin: 0;
+  height: 100vh;
+  background: #0d1117;
+  font-family: 'Cormorant Garamond', serif;
+  color: #e7ebf2;
+  overflow: hidden;
+}
+
+/* --- FOG BACKGROUND --- */
+.fog {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: radial-gradient(circle at 50% 60%, rgba(160,170,180,0.2) 0%, rgba(20,25,30,0.9) 100%);
+  animation: fogMove 20s ease-in-out infinite alternate;
+  filter: blur(25px);
+}
+
+@keyframes fogMove {
+  0% { transform: translateX(0px) translateY(0px); }
+  100% { transform: translateX(-30px) translateY(30px); }
+}
+
+/* --- MAIN CONTENT --- */
+.content {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  top: 45%;
+  transform: translateY(-50%);
+}
+
+h1 {
+  font-size: 2.2em;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 10px rgba(255,255,255,0.2);
+  animation: flicker 5s infinite;
+}
+
+@keyframes flicker {
+  0%, 97%, 100% { opacity: 1; }
+  95%, 99% { opacity: 0.8; }
+}
+
+/* --- CHOICES --- */
+.choices {
+  margin-top: 2em;
+}
+
+.choice {
+  margin: 0 1.5em;
+  text-decoration: none;
+  color: #cfd4dd;
+  font-size: 1.2em;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.choice:hover {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(200,220,255,0.6);
+}
+
+/* --- FADE OVERLAY FOR TRANSITION --- */
+.fade-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(10, 15, 20, 0);
+  pointer-events: none;
+  transition: background 1.2s ease;
+}
+
+.fade-active {
+  background: rgba(10, 15, 20, 1);
+}
+
+/* --- AUDIO (hidden) --- */
+audio {
+  display: none;
+}

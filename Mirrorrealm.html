@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Other Side</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Georgia', serif;}
+body,html{width:100%;height:100%;overflow:hidden;background:#000;}
+.scene{display:none;position:relative;width:100vw;height:100vh;overflow:hidden;transition: opacity 1s;}
+.scene.active{display:block;opacity:1;animation: fadeIn 1s;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.background{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;z-index:0;}
+.hotspot{position:absolute;width:70px;height:70px;border-radius:50%;background: rgba(173,216,230,0.5);border:2px solid #fff;cursor:pointer;box-shadow:0 0 15px rgba(173,216,230,0.7);transition: transform 0.3s, box-shadow 0.3s; z-index:2;}
+.hotspot:hover{transform:scale(1.3);box-shadow:0 0 25px rgba(173,216,230,1);}
+.popup{position:absolute;bottom:10%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;padding:15px 20px;border-radius:10px;display:none;max-width:400px;text-align:center;font-size:1.1em; z-index:3;}
+.popup.show{display:block;animation:popupFade 0.5s;}
+@keyframes popupFade{from{opacity:0;}to{opacity:1;}}
+.particle{position:absolute;width:5px;height:5px;background: rgba(255,255,255,0.8);border-radius:50%;pointer-events:none;animation: float 5s linear infinite; z-index:1;}
+@keyframes float{0%{transform:translateY(0px) translateX(0px);opacity:1;}50%{transform:translateY(-100px) translateX(50px);opacity:0.5;}100%{transform:translateY(0px) translateX(-50px);opacity:1;}}
+#choiceOverlay{display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background: rgba(0,0,0,0.85);padding:20px;border-radius:10px;z-index:4;text-align:center;}
+#choiceQuestion{color:#fff;margin-bottom:10px;font-size:1.2em;}
+#choiceButtons button{margin:5px;padding:8px 15px;border-radius:8px;border:none;cursor:pointer;font-size:1em;background:#87ceeb;color:#000;}
+#choiceButtons button:hover{background:#00bfff;}
+
+/* Fun Fact PNG Button */
+.funfact-btn{position:absolute;cursor:pointer;transition: transform 0.3s, opacity 0.3s;}
+.funfact-btn:hover{transform: scale(1.2); opacity:0.8;}
+
+/* Intro Screen */
+#introScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:black;color:white;display:flex;justify-content:center;align-items:center;text-align:center;padding:20px;font-size:1.5em;z-index:10;}
+/* Lore Popups */
+.lore-btn {
+  position: absolute;
+  bottom: 10%;
+  right: 10%;
+  background: rgba(255,255,255,0.8);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 1em;
+  z-index: 3;
+  transition: background 0.3s, transform 0.3s;
+}
+.lore-btn:hover {
+  background: rgba(255,255,255,1);
+  transform: scale(1.1);
+}
+
+.lore-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  animation: fadeIn 0.6s;
+}
+
+.lore-overlay.show {
+  display: flex;
+}
+
+.lore-image {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+  pointer-events: none;
+  image-rendering: auto;
+}
+/* 📱 Mobile Responsive Optimization */
+@media (max-width: 768px) {
+  html, body {
+    overflow: hidden;
+  }
+
+  .hotspot {
+    width: 12vw;
+    height: 12vw;
+    min-width: 44px;
+    min-height: 44px;
+    border-width: 1.5px;
+  }
+
+  .funfact-btn {
+    width: 12vw !important;
+    min-width: 40px;
+  }
+
+  .popup {
+    bottom: 15%;
+    font-size: 0.95em;
+    max-width: 90%;
+    padding: 12px;
+  }
+
+  #introScreen {
+    padding: 10px;
+    font-size: 1.2em;
+  }
+
+  #choiceOverlay {
+    width: 90%;
+    max-width: 350px;
+    padding: 15px;
+  }
+
+  #choiceQuestion {
+    font-size: 1em;
+  }
+
+  #choiceButtons button {
+    font-size: 0.9em;
+    padding: 10px 12px;
+    margin: 4px;
+  }
+
+  .lore-btn {
+    padding: 8px 10px;
+    font-size: 0.9em;
+  }
+
+  .lore-image {
+    max-width: 95%;
+    max-height: 85%;
+  }
+
+  .background {
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+/* ✨ Very Small Screens (e.g. iPhone SE) */
+@media (max-width: 480px) {
+  .popup {
+    font-size: 0.85em;
+  }
+  #introScreen {
+    font-size: 1em;
+  }
+  #choiceButtons button {
+    font-size: 0.8em;
+    padding: 8px 10px;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Typewriter Intro -->
+<div id="introScreen"><span id="introText"></span></div>
+
+<!-- Scenes -->
+
+<!-- Castle Home -->
+<div id="scene-home" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030048723.png" class="background">
+  <button class="hotspot" style="top:50%; left:70%;" onclick="showChoiceButtons('Which path will you take?', ['Forest','Cove','Marsh'], ['scene-Forest','scene-cove','scene-marsh'])">Head inland</button>
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030128279.png" class="funfact-btn" style="top:20%; left:80%; width:60px;" onclick="showPopup('Seabirds chirp loudly overhead...its so hot out...You should find shade soon.')">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030141530.png" class="funfact-btn" style="top:40%; left:60%; width:50px;" onclick="showPopup('The forest is deep, something gentle calls to you')">
+</div>
+
+<!-- Forest -->
+<div id="scene-Forest" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030448269.png" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-home')">Back to Beach</button>
+  <button class="hotspot" style="top:30%; left:60%;" onclick="showPopup('Plants seem to grow in a chaotic manner here, the land has a mind of its own.')">Inspect Plants</button>
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030515437.png" class="funfact-btn" style="top:50%; left:70%; width:60px;" onclick="showPopup('Bugs hum and creatures skitter about in the trees...Lets hope you dont get lost...')">
+  <button class="hotspot" style="top:20%; left:80%;" onclick="goToScene('scene-secondary-spring')">Climb higher into the trees</button>
+  <button class="hotspot" style="top:20%; left:40%;" 
+        onclick="goToScene('scene-marsh')">
+  Walk to the Marsh
+</button>
+
+
+</div>
+
+<!-- Secondary Spring (New Area) -->
+<div id="scene-secondary-spring" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030752332.png" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-Forest')">Back to Forest</button>
+  <button class="lore-btn" onclick="showLore('springLore')">Click for Lore</button>
+
+<div id="springLore" class="lore-overlay" onclick="hideLore('springLore')">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030914771.png" alt="Spring Lore" class="lore-image">
+</div>
+
+</div>
+
+<!-- Cove -->
+<div id="scene-cove" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031319175.png" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-home')">Back to Beach</button>
+  <button class="hotspot" style="top:40%; left:60%;" onclick="showPopup('Waves lap gently at the glowing sand.')">Look around</button>
+  <button class="hotspot" style="top:50%; left:30%;" onclick="goToScene('scene-grotto')">Explore Hidden Grotto</button>
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031448096.png" class="funfact-btn" style="top:60%; left:20%; width:60px;" onclick="showPopup('Some shells here glow faintly under moonlight.')">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031428050.png" class="funfact-btn" style="top:30%; left:50%; width:50px;" onclick="showPopup('A family of crabs hide in the rocks...I wonder if they know that other guy...')">
+</div>
+
+<!-- Sunken Cove (New Area) -->
+<div id="scene-sunken-cove" class="scene">
+  <img src="images/sunken_cove.jpg" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-cove')">Back to Cove</button>
+  <audio id="audio-sunken-cove" loop><source src="ambient_ocean.mp3" type="audio/mpeg"></audio>
+</div>
+
+<!-- Marsh -->
+<div id="scene-marsh" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_032817171.png" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-home')">Back to Beach</button>
+  <button class="hotspot" style="top:80%; left:30%;" onclick="goToScene('scene-Citadel')">Head towards ruins</button>
+  <button class="hotspot" style="top:30%; left:20%;" onclick="showPopup('The marsh is misty and cool, you feel a sense of familiarity.')">Look Around</button>
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_033107390.png" class="funfact-btn" style="top:40%; left:60%; width:60px;" onclick="showPopup('Fireflies here create patterns only visible to certain creatures.')">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_033049519.png" class="funfact-btn" style="top:20%; left:30%; width:50px;" onclick="showPopup('A rare marsh orchid blooms here.')">
+  <button class="hotspot" style="top:20%; left:70%;" onclick="goToScene('scene-deep-marsh')">Follow Marsh Path</button>
+  <button class="hotspot" style="top:40%; left:50%;" 
+        onclick="window.location.href='https://phalaenopsyx.neocities.org/statuegame'">
+  Approach the Statue
+</button>
+
+  <audio id="audio-marsh" loop><source src="ambient_marsh.mp3" type="audio/mpeg"></audio>
+  
+
+</div>
+
+<!-- Deep Marsh (New Area) -->
+<div id="scene-deep-marsh" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_033222699.png" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-marsh')">Back to Marsh</button>
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_033337042.png" class="funfact-btn" style="top:60%; left:50%; width:50px;" onclick="showPopup('It seems to be getting more dense as you walk, suddenly you feel like you are being watched. Whatever is out here, might not worth it.')">
+</div>
+
+<!-- Grotto -->
+<div id="scene-grotto" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031640878.png" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-cove')">Back to Cove</button>
+  <button class="hotspot" style="top:30%; left:60%;" onclick="showPopup('Glowing crystals illuminate the cavern softly.')">Inspect Grotto</button>
+  <button class="hotspot" style="top:50%; left:80%;" onclick="goToScene('scene-tower')">Move Deeper into the cave</button>
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031711437.png" class="funfact-btn" style="top:20%; left:30%; width:60px;" onclick="showPopup('Wisps float aimlessly around the ruin walls, they ever so slightly light up the corridor.')">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031711437.png" class="funfact-btn" style="top:50%; left:50%; width:50px;" onclick="showPopup('A hidden alcove has  glowing moss, It is oddly very cold to the touch (Brr).')">
+  <audio id="audio-grotto" loop><source src="ambient_cave.mp3" type="audio/mpeg"></audio>
+</div>
+
+<!-- Tower -->
+<div id="scene-tower" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_032032104.png" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-grotto')">Back to Grotto</button>
+  <button class="hotspot" style="top:40%; left:60%;" onclick="showPopup('Its dark and you are surrounded by stalagmites...A chilly wind passes by you.')">Look Around</button>
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_032141472.png" class="funfact-btn" style="top:30%; left:70%; width:60px;" onclick="showPopup('The silence of the cave is unsettling, you yearn for a hand to hold.')">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031711437.png" class="funfact-btn" style="top:60%; left:40%; width:50px;" onclick="showPopup('A faint hum can be heard passing through')">
+  <button class="hotspot" style="top:20%; left:80%;" onclick="goToScene('scene-floating-island')">Go deeper?</button>
+  <audio id="audio-tower" loop><source src="ambient_ocean.mp3" type="audio/mpeg"></audio>
+</div>
+
+<!-- Floating Island (New Area) -->
+<div id="scene-floating-island" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_032521588.png" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-tower')">Back to Cave</button>
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031711437.png" class="funfact-btn" style="top:40%; left:50%; width:50px;" onclick="showPopup('The oracle at work...should we be here?')">
+ 
+
+</div>
+
+<!-- Forest Glade -->
+<div id="scene-Citadel" class="scene">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_033620326.png" class="background">
+  <button class="hotspot" style="top:80%; left:10%;" onclick="goToScene('scene-home')">Back to Beach</button>
+  <button class="lore-btn" onclick="showLore('forestLore')">Click for Lore</button>
+  <button class="hotspot" style="top:60%; left:80%;" 
+        onclick="window.location.href='https://phalaenopsyx.neocities.org/BookofSapientialos'">
+  Mysterious Book
+</button>
+
+<div id="forestLore" class="lore-overlay" onclick="hideLore('forestLore')">
+  <img src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_033630014.png" alt="Forest Lore" class="lore-image">
+</div>
+
+
+</div>
+<
+
+<!-- Popups and Choice Overlay -->
+<div id="popup" class="popup"></div>
+<div id="choiceOverlay">
+  <div id="choiceQuestion"></div>
+  <div id="choiceButtons"></div>
+</div>
+
+<script>
+// Typewriter Intro
+const introTextStr = "You wake up covered in sand...Coming to your senses, the shores of a sprawling island come into view ... a crab pinches at your nose...(owie)";
+const introElement = document.getElementById('introText');
+const introScreen = document.getElementById('introScreen');
+let i = 0;
+const typingSpeed = 100;
+function typeWriter() {
+  if(i<introTextStr.length){
+    introElement.textContent += introTextStr.charAt(i);
+    i++;
+    setTimeout(typeWriter, typingSpeed);
+  } else {
+    setTimeout(()=>{introScreen.style.transition='opacity 2s'; introScreen.style.opacity='0';
+      setTimeout(()=>{introScreen.style.display='none'; playAudio('scene-home'); document.getElementById('scene-home').classList.add('active');},2000);
+    },1000);
+  }
+}
+window.onload = typeWriter;
+
+// Scene Navigation
+let currentScene='scene-home';
+function goToScene(sceneId){
+  document.getElementById(currentScene).classList.remove('active');
+  stopAudio(currentScene);
+  document.getElementById(sceneId).classList.add('active');
+  playAudio(sceneId);
+  hidePopup();
+  hideChoiceOverlay();
+  currentScene=sceneId;
+}
+
+// Popup
+function showPopup(text){const popup=document.getElementById('popup'); popup.textContent=text; popup.classList.add('show'); setTimeout(()=>{popup.classList.remove('show');},4000);}
+function hidePopup(){document.getElementById('popup').classList.remove('show');}
+
+// Clickable Choices
+function showChoiceButtons(question, options, targets){
+  const overlay=document.getElementById('choiceOverlay');
+  const questionDiv=document.getElementById('choiceQuestion');
+  const buttonsDiv=document.getElementById('choiceButtons');
+  questionDiv.textContent=question;
+  buttonsDiv.innerHTML='';
+  options.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.textContent=opt;
+    btn.onclick=()=>{goToScene(targets[i]); overlay.style.display='none';};
+    buttonsDiv.appendChild(btn);
+  });
+  overlay.style.display='block';
+}
+function hideChoiceOverlay(){document.getElementById('choiceOverlay').style.display='none';}
+
+// Audio
+function playAudio(sceneId){const audio=document.querySelector(`#${sceneId} audio`);if(audio) audio.play();}
+function stopAudio(sceneId){const audio=document.querySelector(`#${sceneId} audio`);if(audio) audio.pause();}
+
+// Particles
+function createParticles(sceneId,count=30){
+  const scene=document.getElementById(sceneId);
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.top=Math.random()*100+'vh';
+    p.style.left=Math.random()*100+'vw';
+    p.style.animationDuration=(3+Math.random()*5)+'s';
+    scene.appendChild(p);
+  }
+}
+['scene-home','scene-spring','scene-secondary-spring','scene-cove','scene-sunken-cove','scene-marsh','scene-deep-marsh','scene-grotto','scene-tower','scene-floating-island','scene-forest'].forEach(s=>createParticles(s));
+// Lore Popup Logic
+function showLore(id) {
+  document.getElementById(id).classList.add('show');
+}
+
+function hideLore(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+</script>
+<script>
+// 📱 Automatically swap backgrounds for mobile portrait orientation
+function updateBackgrounds() {
+  const isMobilePortrait = window.matchMedia("(max-width: 768px) and (orientation: portrait)").matches;
+
+  const sceneBackgrounds = {
+    "scene-home": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030048723.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_001635953.png"
+    },
+    "scene-Forest": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030448269.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_013333942.png"
+    },
+    "scene-secondary-spring": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_030752332.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_013559514.png"
+    },
+    "scene-cove": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031319175.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_013646652.png"
+    },
+    "scene-marsh": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_032817171.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_013718598.png"
+    },
+    "scene-deep-marsh": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_033222699.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_013806761.png"
+    },
+    "scene-grotto": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_031640878.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_013844029.png"
+    },
+    "scene-tower": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_032032104.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_013924572.png"
+    },
+    "scene-floating-island": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_032521588.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_013958878.png"
+    },
+    "scene-Citadel": {
+      desktop: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_033620326.png",
+      mobile: "https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-21_014025706.png"
+    }
+  };
+
+  for (const [sceneId, paths] of Object.entries(sceneBackgrounds)) {
+    const bg = document.querySelector(`#${sceneId} .background`);
+    if (bg) bg.src = isMobilePortrait ? paths.mobile : paths.desktop;
+  }
+}
+
+// Run on load and when resizing/orientation changes
+window.addEventListener("load", updateBackgrounds);
+window.addEventListener("resize", updateBackgrounds);
+window.addEventListener("orientationchange", updateBackgrounds);
+</script>
+<style>
+/* ---------------- Desktop Buttons (default) ---------------- */
+.hotspot {
+  background: rgba(173,216,230,0.5);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(173,216,230,0.7);
+  color: #000;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  font-size: 0.8em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 70px;
+  height: 70px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.lore-btn {
+  background: rgba(255,255,255,0.8);
+  color: #000;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+#choiceButtons button {
+  background: #87ceeb;
+  color: #000;
+  padding: 8px 15px;
+  border-radius: 8px;
+  font-size: 1em;
+}
+
+button:not(.hotspot):not(.lore-btn):not(#choiceButtons button) {
+  background: #ffb6c1;
+  color: #000;
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+/* ---------------- Mobile Buttons (<=768px) ---------------- */
+@media (max-width: 768px) {
+  .hotspot {
+    width: 14vw;
+    height: 14vw;
+    min-width: 50px;
+    min-height: 50px;
+    font-size: 0.75em;
+  }
+  .lore-btn {
+    padding: 10px 15px;
+    font-size: 1em;
+    border-radius: 14px;
+  }
+  #choiceButtons button {
+    padding: 10px 16px;
+    font-size: 1em;
+    border-radius: 12px;
+  }
+  button:not(.hotspot):not(.lore-btn):not(#choiceButtons button) {
+    padding: 8px 12px;
+    font-size: 1em;
+    border-radius: 10px;
+  }
+}
+
+/* ---------------- Tablet Buttons (769px - 1024px) ---------------- */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hotspot {
+    width: 12vw;
+    height: 12vw;
+    min-width: 60px;
+    min-height: 60px;
+    font-size: 0.85em;
+  }
+  .lore-btn {
+    padding: 12px 18px;
+    font-size: 1.05em;
+    border-radius: 14px;
+  }
+  #choiceButtons button {
+    padding: 12px 18px;
+    font-size: 1.05em;
+    border-radius: 14px;
+  }
+  button:not(.hotspot):not(.lore-btn):not(#choiceButtons button) {
+    padding: 10px 14px;
+    font-size: 1em;
+    border-radius: 12px;
+  }
+}
+</style>
+
+
+
+</body>
+</html>

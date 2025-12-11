@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Mirror Gate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Cormorant Garamond', serif;
+      background: url('https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_024841076.png') no-repeat center center fixed;
+      background-size: cover;
+      background-attachment: fixed;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    .content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      padding: 20px;
+      max-width: 900px;
+      width: 90%;
+    }
+
+    .story-text {
+      font-size: 2rem;
+      line-height: 1.5;
+      min-height: 3em;
+      white-space: pre-wrap;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .story-text.visible {
+      opacity: 1;
+    }
+
+    .choices {
+      display: none;
+      margin-top: 2rem;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 2s ease, transform 2s ease;
+      position: relative;
+    }
+
+    .choices.show {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Question styling */
+    .choices h1 {
+      position: relative;
+      z-index: 3;
+      font-size: 3rem; 
+      color: #fff;
+      text-shadow: 0 0 15px rgba(255,255,255,0.8);
+      background: rgba(0,0,0,0.4);
+      padding: 20px 30px;
+      border-radius: 20px;
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+
+    .choice {
+      display: inline-block;
+      padding: 1.5rem 3rem;
+      margin: 0 1rem;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      text-decoration: none;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      font-size: 1.5rem;
+      border-radius: 50px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(8px);
+      transition: background 0.4s ease, transform 0.3s ease, box-shadow 0.4s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .choice:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+    }
+
+    #mirror-img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1.6);
+      max-width: 2200px;
+      width: 95%;
+      height: auto;
+      opacity: 0;
+      transition: opacity 2s ease, transform 2s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    #mirror-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1.2);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%);
+      opacity: 0;
+      transition: opacity 2.5s ease, transform 2.5s ease;
+      z-index: 0;
+      filter: blur(20px);
+      pointer-events: none;
+    }
+
+    .fade-overlay {
+      position: fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:#000;
+      opacity:0;
+      transition: opacity 1.2s;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .fade-overlay.fade-active {
+      opacity:1;
+      pointer-events: all;
+    }
+
+    #volume-control {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      background: rgba(0,0,0,0.4);
+      padding: 5px 10px;
+      border-radius: 8px;
+    }
+
+    #volume-control input[type="range"] {
+      width: 120px;
+    }
+
+    #volume-control label {
+      margin-right: 5px;
+      font-size: 0.9rem;
+    }
+
+    /* Mobile optimization */
+    @media (max-width: 768px) {
+      .story-text {
+        font-size: 1.4rem;
+        padding: 0 10px;
+      }
+
+      .choices h1 {
+        font-size: 2rem;
+        padding: 15px 20px;
+      }
+
+      .choice {
+        display: block;
+        width: 60%;
+        max-width: 220px;
+        margin: 0.5rem auto;
+        font-size: 1rem;
+        padding: 0.7rem 1.2rem;
+      }
+
+      #mirror-img {
+        max-width: 100%;
+        transform: translate(-50%, -50%) scale(1.4);
+      }
+
+      #mirror-glow {
+        width: 400px;
+        height: 400px;
+        transform: translate(-50%, -50%) scale(1.2);
+      }
+
+      .content {
+        padding: 10px;
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="content">
+    <div id="story">
+      <div class="story-text" id="text"></div>
+    </div>
+
+    <div class="choices">
+      <img id="mirror-img" src="https://phalaenopsyx.neocities.org/point%20and%20click/image_2025-10-20_024902713.png" alt="Mirror" />
+      <h1>See what is on the other side?</h1>
+      <a href="https://phalaenopsyx.neocities.org/Mirrorrealm" class="choice yes">Yes</a>
+      <a href="https://phalaenopsyx.neocities.org/Goodbye" class="choice no">No</a>
+    </div>
+
+    <div id="mirror-glow"></div>
+  </main>
+
+  <div class="fade-overlay"></div>
+
+  <script>
+    const storyLines = [
+      "Finding yourself going in circles around the ruins, you eventually find and pick up an ornate hand mirror off the ground... It looks very old....",
+      "You dust it off as a thick fog consumes you."
+    ];
+
+    const textElement = document.getElementById('text');
+    const choices = document.querySelector('.choices');
+    const mirror = document.getElementById('mirror-img');
+    const choiceTitle = choices.querySelector('h1');
+    let lineIndex = 0;
+
+    function typeLine(line, callback) {
+      textElement.textContent = '';
+      textElement.classList.remove('visible');
+      setTimeout(() => textElement.classList.add('visible'), 50);
+
+      let charIndex = 0;
+      const interval = setInterval(() => {
+        textElement.textContent += line[charIndex];
+        charIndex++;
+        if (charIndex === line.length) {
+          clearInterval(interval);
+          setTimeout(callback, 1500);
+        }
+      }, 50);
+    }
+
+    function showNextLine() {
+      if (lineIndex < storyLines.length) {
+        typeLine(storyLines[lineIndex], () => {
+          lineIndex++;
+          showNextLine();
+        });
+      } else {
+        document.getElementById('story').style.display = 'none';
+        choices.classList.add('show');
+
+        // Smooth fade-in for mirror and question
+        setTimeout(() => {
+          mirror.style.opacity = 1;
+          mirror.style.transform = 'translate(-50%, -50%) scale(1.6)';
+          choiceTitle.style.opacity = 1;
+        }, 300); 
+      }
+    }
+
+    window.onload = showNextLine;
+
+    const links = document.querySelectorAll('.choice');
+    const overlay = document.querySelector('.fade-overlay');
+
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        overlay.classList.add('fade-active');
+        setTimeout(() => window.location = link.href, 1200);
+      });
+    });
+  </script>
+</body>
+</html>
